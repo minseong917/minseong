@@ -487,44 +487,43 @@ if not st.session_state.get("logged_in"):
     # 2. OS 선택
     os_type = st.radio("💻 OS 선택", ["Windows 💻", "Mac 🍎"], horizontal=True)
 
-    # 3. 네비게이션 메뉴
-    menu = st.radio(
-        "📌 메뉴",
-        ["직업 선택하기", "유용한 단축키", "유용한 사이트", "나만의 단축키 메모", "치트시트 다운로드"]
-    )
+  # (약 490번 줄 시작 위치)
+# 💻 OS 선택
+os_type = st.radio("💻 OS 선택", ["Windows 💻", "Mac 🍎"], horizontal=True)
 
-    st.write("---")
-    if st.session_state.yourjob:
-        st.info(f"선택 직업: **{st.session_state.yourjob}**")
-    else:
-        st.caption("직업을 먼저 선택해주세요!")
+# 📌 메뉴 선택 (menu 변수가 여기서 정상 선언됩니다)
+menu = st.radio(
+    "📌 메뉴",
+    ["직업 선택하기", "유용한 단축키", "유용한 사이트", "나만의 단축키 메모", "치트시트 다운로드"]
+)
 
-# if menu == ... 구문보다 상단에 선언되어야 합니다.
-menu = st.sidebar.selectbox("메뉴", ["직업 선택하기", "단축키 목록", "설정"])
-# ==========================================
-# 사이드바 구성 (메뉴 정의)
-# ==========================================
-with st.sidebar:
-    st.header("💡 스마트 직업 치트시트")
+st.markdown("---")
+
+# -------------------------------
+# 1. 직업 선택하기
+# -------------------------------
+if menu == "직업 선택하기":
+    st.title("🎯 직업 선택하기")
     
-    # 로그인 상태에 따른 사용자 정보 표시
-    if st.session_state.get("logged_in", False):
-        st.success(f"👤 {st.session_state.get('user_id', '사용자')}님 로그인됨")
-        # 로그인 상태 메뉴 목록
-        menu = st.radio(
-            "이동할 메뉴를 선택하세요",
-            ["🎯 직업 선택하기", "⌨️ 단축키 치트시트", "💡 활용 팁"],
-            key="logged_in_menu"
+    if st.session_state.yourjob is None:
+        st.write("본인의 직업 또는 역할을 선택하시면 맞춤 단축키와 추천 팁을 제공합니다.")
+        job = st.selectbox(
+            "당신의 직업은 무엇인가요?",
+            ["학생", "교사", "직장인", "개발자", "디자이너", "콘텐츠 크리에이터"]
         )
-    else:
-        st.info("🔒 로그인이 필요합니다")
-        # 비로그인 상태 메뉴 목록
-        menu = st.radio(
-            "이동할 메뉴를 선택하세요",
-            ["🔒 로그인 / 회원가입", "🎯 직업 선택하기", "⌨️ 단축키 치트시트"],
-            key="logged_out_menu"
-        )
-
+        
+        if st.button("직업 선택 완료"):
+            st.session_state.yourjob = job
+            if st.session_state.logged_in:
+                # KeyError 방지
+                if st.session_state.user_id not in user_data:
+                    user_data[st.session_state.user_id] = {}
+                user_data[st.session_state.user_id]["job"] = job
+                save_data(user_data)
+            st.balloons()
+            st.success(f"'{job}'(으)로 선택되었습니다!")
+            time.sleep(1)
+            st.rerun()
 # ==========================================
 # 메인 화면 로직 (메뉴 연결)
 # ==========================================
@@ -538,18 +537,6 @@ if "직업 선택하기" in menu:
             "당신의 직업은 무엇인가요?",
             ["학생", "교사", "직장인", "개발자", "디자이너", "콘텐츠 크리에이터"]
         )
-        
-        if st.button("직업 선택 완료"):
-            st.session_state.yourjob = job
-            if st.session_state.logged_in:
-                if st.session_state.user_id not in user_data:
-                    user_data[st.session_state.user_id] = {}
-                user_data[st.session_state.user_id]["job"] = job
-                save_data(user_data)
-            st.balloons()
-            st.success(f"'{job}'(으)로 선택되었습니다!")
-            time.sleep(1)
-            st.rerun()
 # -------------------------------
 # 1. 직업 선택하기
 # -------------------------------
