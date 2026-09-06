@@ -472,13 +472,15 @@ if not st.session_state.get("logged_in"):
         # 토큰에서 이메일 정보 가져오기
         # JWT 토큰 해독 후 이메일 추출
         id_token = result["token"].get("id_token", "")
-        if id_token:
-            payload = id_token.split(".")[1]
-            payload += "=" * (-len(payload) % 4)  # 패딩 보정
-            user_info = json.loads(decoded_bytes.decode("utf-8"))
-            user_email = user_info.get("email", "Google_User")
-        else:
-            user_email = "Google_User"
+       if id_token:
+           payload = id_token.split(".")[1]
+           payload += "=" * (-len(payload) % 4)  # 패딩 보정
+           decoded_bytes = base64.urlsafe_b64decode(payload)  # <-- 이 줄을 반드시 추가해주세요
+           user_info = json.loads(decoded_bytes.decode("utf-8"))
+           user_email = user_info.get("email", "Google_User")
+           
+       else:
+           user_email = "Google_User"
 
     st.write("---")
 
@@ -497,6 +499,8 @@ if not st.session_state.get("logged_in"):
     else:
         st.caption("직업을 먼저 선택해주세요!")
 
+# if menu == ... 구문보다 상단에 선언되어야 합니다.
+menu = st.sidebar.selectbox("메뉴", ["직업 선택하기", "단축키 목록", "설정"])
 
 # -------------------------------
 # 1. 직업 선택하기
