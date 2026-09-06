@@ -470,9 +470,15 @@ if not st.session_state.get("logged_in"):
         # 로그인 성공 처리
         st.session_state.logged_in = True
         # 토큰에서 이메일 정보 가져오기
-        user_email = result["token"].get("id_token", {}).get("email", "Google_User")
-        st.session_state.user_id = user_email
-        st.rerun()
+        # JWT 토큰 해독 후 이메일 추출
+        id_token = result["token"].get("id_token", "")
+        if id_token:
+            payload = id_token.split(".")[1]
+            payload += "=" * (-len(payload) % 4)  # 패딩 보정
+            user_info = json.loads(base64.b64decode(payload).decode("utf-8"))
+            user_email = user_info.get("email", "Google_User")
+        else:
+            user_email = "Google_User"
 
     st.write("---")
 
