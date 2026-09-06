@@ -430,7 +430,7 @@ with st.sidebar:
             st.write("---")
             st.caption("🚀 1초 간편 소셜 로그인")
             cg, cn, ck = st.columns(3)
-            if cg.button("🔴 구글", key="btn_google", use_container_width=True):
+            if cg.button("구글", key="btn_google", use_container_width=True):
                 sid = "Google_사용자"
                 if sid not in user_data:
                     user_data[sid] = {"password": "", "job": None, "notes": []}
