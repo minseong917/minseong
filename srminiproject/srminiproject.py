@@ -475,7 +475,7 @@ if not st.session_state.get("logged_in"):
         if id_token:
             payload = id_token.split(".")[1]
             payload += "=" * (-len(payload) % 4)  # 패딩 보정
-            user_info = json.loads(base64.b64decode(payload).decode("utf-8"))
+            user_info = json.loads(decoded_bytes.decode("utf-8"))
             user_email = user_info.get("email", "Google_User")
         else:
             user_email = "Google_User"
