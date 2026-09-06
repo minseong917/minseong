@@ -3,6 +3,7 @@ import time
 import json
 import os
 from streamlit_oauth import OAuth2Component
+import base64
 
 # -------------------------------
 # 0. 브라우저 탭 설정 (제목 및 아이콘)
