@@ -515,9 +515,12 @@ if menu == "직업 선택하기":
             ["학생", "교사", "직장인", "개발자", "디자이너", "콘텐츠 제작자", "영상 편집자", "기타 사용자(일반 사용자)"]
         )
 
-        if st.button("직업 선택 완료"):
+    if st.button("직업 선택 완료"):
             st.session_state.yourjob = job
             if st.session_state.logged_in:
+                # KeyError 방지: 사용자 ID가 user_data에 없으면 빈 딕셔너리 생성
+                if st.session_state.user_id not in user_data:
+                    user_data[st.session_state.user_id] = {}
                 user_data[st.session_state.user_id]["job"] = job
                 save_data(user_data)
             st.balloons()
