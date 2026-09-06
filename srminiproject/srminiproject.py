@@ -2,6 +2,7 @@ import streamlit as st
 import time
 import json
 import os
+from streamlit_oauth import OAuth2Component
 
 # -------------------------------
 # 0. 브라우저 탭 설정 (제목 및 아이콘)
@@ -441,29 +442,36 @@ with st.sidebar:
                 st.session_state.my_notes = user_data[sid].get("notes", [])
                 st.rerun()
 
-            if cn.button("🟢 네이버", key="btn_naver", use_container_width=True):
-                sid = "Naver_사용자"
-                if sid not in user_data:
-                    user_data[sid] = {"password": "", "job": None, "notes": []}
-                user_data["__auto_login__"] = sid
-                save_data(user_data)
-                st.session_state.logged_in = True
-                st.session_state.user_id = sid
-                st.session_state.yourjob = user_data[sid].get("job", None)
-                st.session_state.my_notes = user_data[sid].get("notes", [])
-                st.rerun()
+    from streamlit_oauth import OAuth2Component
 
-            if ck.button("🟡 카카오", key="btn_kakao", use_container_width=True):
-                sid = "Kakao_사용자"
-                if sid not in user_data:
-                    user_data[sid] = {"password": "", "job": None, "notes": []}
-                user_data["__auto_login__"] = sid
-                save_data(user_data)
-                st.session_state.logged_in = True
-                st.session_state.user_id = sid
-                st.session_state.yourjob = user_data[sid].get("job", None)
-                st.session_state.my_notes = user_data[sid].get("notes", [])
-                st.rerun()
+# Streamlit Secrets에서 구글 인증 정보 가져오기
+CLIENT_ID = st.secrets["GOOGLE_CLIENT_ID"]
+CLIENT_SECRET = st.secrets["GOOGLE_CLIENT_SECRET"]
+REDIRECT_URI = st.secrets["REDIRECT_URI"]
+
+AUTHORIZE_URL = "https://accounts.google.com/o/oauth2/v2/auth"
+TOKEN_URL = "https://oauth2.googleapis.com/token"
+REVOKE_TOKEN_URL = "https://oauth2.googleapis.com/revoke"
+
+oauth2 = OAuth2Component(CLIENT_ID, CLIENT_SECRET, AUTHORIZE_URL, TOKEN_URL, TOKEN_URL, REVOKE_TOKEN_URL)
+
+# 구글 로그인 버튼 출력
+if not st.session_state.get("logged_in"):
+    result = oauth2.authorize_button(
+        name="🔴 Google 계정으로 로그인",
+        icon="https://www.google.com/favicon.ico",
+        redirect_uri=REDIRECT_URI,
+        scope="openid email profile",
+        key="google_auth"
+    )
+
+    if result and "token" in result:
+        # 로그인 성공 처리
+        st.session_state.logged_in = True
+        # 토큰에서 이메일 정보 가져오기
+        user_email = result["token"].get("id_token", {}).get("email", "Google_User")
+        st.session_state.user_id = user_email
+        st.rerun()
 
     st.write("---")
 
