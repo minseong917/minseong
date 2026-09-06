@@ -487,14 +487,14 @@ if not st.session_state.get("logged_in"):
     # 2. OS 선택
     os_type = st.radio("💻 OS 선택", ["Windows 💻", "Mac 🍎"], horizontal=True)
 
-  # (약 490번 줄 시작 위치)
-# 💻 OS 선택
-os_type = st.radio("💻 OS 선택", ["Windows 💻", "Mac 🍎"], horizontal=True)
+  # 💻 OS 선택 (key 추가)
+os_type = st.radio("💻 OS 선택", ["Windows 💻", "Mac 🍎"], horizontal=True, key="os_type_main")
 
-# 📌 메뉴 선택 (menu 변수가 여기서 정상 선언됩니다)
+# 📌 메뉴 선택 (key 추가)
 menu = st.radio(
     "📌 메뉴",
-    ["직업 선택하기", "유용한 단축키", "유용한 사이트", "나만의 단축키 메모", "치트시트 다운로드"]
+    ["직업 선택하기", "유용한 단축키", "유용한 사이트", "나만의 단축키 메모", "치트시트 다운로드"],
+    key="main_menu_radio"
 )
 
 st.markdown("---")
