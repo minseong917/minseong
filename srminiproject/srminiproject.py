@@ -483,7 +483,7 @@ with st.sidebar:
     if st.session_state.yourjob:
         st.info(f"선택 직업: **{st.session_state.yourjob}**")
     else:
-        st.caption("직업을 먼저 선택해주세요!")
+        st.info("직업을 먼저 선택해주세요!")
 
 
 # -------------------------------
