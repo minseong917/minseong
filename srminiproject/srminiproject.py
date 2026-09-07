@@ -4,12 +4,9 @@ import json
 import os
 import requests
 
-# -------------------------------
-# 0. 구글 OAuth 설정 (Google Cloud Console에서 발급받은 클라이언트 정보 입력 필요)
-# -------------------------------
-GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "YOUR_GOOGLE_CLIENT_SECRET"
-REDIRECT_URI = "http://localhost:8501"  # 배포 환경일 경우 해당 도메인 주소로 변경
+GOOGLE_CLIENT_ID = "674825074081-uom4bfj9uq03prjqmmkdcu4qla46so97.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET = "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"
+REDIRECT_URI = "https://smartjobandusefullkeys.streamlit.app/"
 
 # -------------------------------
 # 0-1. 브라우저 탭 설정 (제목 및 아이콘)
