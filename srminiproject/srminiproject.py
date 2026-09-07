@@ -510,9 +510,6 @@ with st.sidebar:
             )
             st.link_button("구글 계정으로 로그인 ↗", google_auth_url, use_container_width=True)
 
-    st.write("---")
-
-
     # 네이버 로그인 버튼
             st.write("---")
             st.caption(" N 네이버 계정 간편 로그인")
