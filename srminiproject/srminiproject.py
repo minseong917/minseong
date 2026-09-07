@@ -8,6 +8,10 @@ GOOGLE_CLIENT_ID = "674825074081-uom4bfj9uq03prjqmmkdcu4qla46so97.apps.googleuse
 GOOGLE_CLIENT_SECRET = "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"
 REDIRECT_URI = "https://smartjobandusefullkeys.streamlit.app/"
 
+# 네이버 OAuth 설정 추가
+NAVER_CLIENT_ID = "xgUzDPclDitKJPQC1w4z"
+NAVER_CLIENT_SECRET = "sZ5DrBZ7XO"
+
 # -------------------------------
 # 0-1. 브라우저 탭 설정 (제목 및 아이콘)
 # -------------------------------
@@ -40,9 +44,8 @@ def save_data(data):
 
 user_data = load_data()
 
-
 # -------------------------------
-# 세션 상태 초기화 & 구글 로그인 콜백 처리
+# 세션 상태 초기화 & 소셜 로그인 콜백 처리
 # -------------------------------
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -53,8 +56,8 @@ if "yourjob" not in st.session_state:
 if "my_notes" not in st.session_state:
     st.session_state.my_notes = []
 
-# 구글 로그인 리다이렉트 콜백 처리 (Authorization Code 교환)
-if "code" in st.query_params and not st.session_state.logged_in:
+# 1) 구글 로그인 리다이렉트 콜백 처리 (state 파라미터가 없을 때만 구글로 판별)
+if "code" in st.query_params and "state" not in st.query_params and not st.session_state.logged_in:
     code = st.query_params["code"]
     token_url = "https://oauth2.googleapis.com/token"
     payload = {
@@ -102,6 +105,48 @@ if not st.session_state.logged_in and user_data.get("__auto_login__"):
         st.session_state.yourjob = user_data[saved_user].get("job", None)
         st.session_state.my_notes = user_data[saved_user].get("notes", [])
 
+# 2) 네이버 로그인 리다이렉트 콜백 처리 (state 파라미터가 포함되어 있을 때)
+if "code" in st.query_params and "state" in st.query_params and not st.session_state.logged_in:
+    code = st.query_params["code"]
+    state = st.query_params["state"]
+    
+    token_url = "https://nid.naver.com/oauth2.0/token"
+    payload = {
+        "grant_type": "authorization_code",
+        "client_id": NAVER_CLIENT_ID,
+        "client_secret": NAVER_CLIENT_SECRET,
+        "code": code,
+        "state": state
+    }
+    try:
+        token_res = requests.post(token_url, data=payload)
+        token_json = token_res.json()
+        access_token = token_json.get("access_token")
+        
+        if access_token:
+            user_info_res = requests.get(
+                "https://openapi.naver.com/v1/nid/me",
+                headers={"Authorization": f"Bearer {access_token}"}
+            )
+            user_info = user_info_res.json()
+            response_obj = user_info.get("response", {})
+            email = response_obj.get("email")
+            
+            if email:
+                if email not in user_data:
+                    user_data[email] = {"password": "", "job": None, "notes": []}
+                user_data["__auto_login__"] = email
+                save_data(user_data)
+                
+                st.session_state.logged_in = True
+                st.session_state.user_id = email
+                st.session_state.yourjob = user_data[email].get("job", None)
+                st.session_state.my_notes = user_data[email].get("notes", [])
+                
+                st.query_params.clear()
+                st.rerun()
+    except Exception as e:
+        st.error(f"네이버 로그인 인증 중 오류가 발생했습니다: {e}")
 
 # -------------------------------
 # 단축키 데이터 (Windows 키, Mac 키, 기능 설명)
@@ -457,7 +502,7 @@ with st.sidebar:
 
             # 구글 계정으로 로그인 (실제 OAuth 연동)
             st.write("---")
-            st.caption("🚀 구글 계정 간편 로그인")
+            st.caption(" G 구글 계정 간편 로그인")
             google_auth_url = (
                 f"https://accounts.google.com/o/oauth2/v2/auth?response_type=code"
                 f"&client_id={GOOGLE_CLIENT_ID}&redirect_uri={REDIRECT_URI}"
@@ -466,6 +511,17 @@ with st.sidebar:
             st.link_button("구글 계정으로 로그인 ↗", google_auth_url, use_container_width=True)
 
     st.write("---")
+
+
+    # 네이버 로그인 버튼
+            st.write("---")
+            st.caption(" N 네이버 계정 간편 로그인")
+            naver_auth_url = (
+                f"https://nid.naver.com/oauth2.0/authorize?response_type=code"
+                f"&client_id={NAVER_CLIENT_ID}&redirect_uri={urllib.parse.quote(REDIRECT_URI)}"
+                f"&state=smartjob_naver_login"
+            )
+            st.link_button("네이버 계정으로 로그인 ↗", naver_auth_url, use_container_width=True)
 
     # 2. OS 선택
     os_type = st.radio("💻 OS 선택", ["Windows 💻", "Mac 🍎"], horizontal=True)
