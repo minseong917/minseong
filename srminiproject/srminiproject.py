@@ -5,8 +5,8 @@ import os
 import requests
 import urllib.parse
 
-GOOGLE_CLIENT_ID = "674825074081-uom4bfj9uq03prjqmmkdcu4qla46so97.apps.googleusercontent.com"
-GOOGLE_CLIENT_SECRET = "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"
+GOOGLE_CLIENT_ID = st.secrets["GOOGLE_CLIENT_ID"]
+GOOGLE_CLIENT_SECRET = st.secrets["GOOGLE_CLIENT_SECRET"]
 REDIRECT_URI = "https://smartjobandusefullkeys.streamlit.app/"
 # -------------------------------
 # 0-1. 브라우저 탭 설정 (제목 및 아이콘)
