@@ -231,7 +231,7 @@ def get_ai_shortcut_recommendation(query, os_type):
             st.rerun()
     st.write("---")
 
-    # 2. OS 선택
+# 2. OS 선택
     os_type = st.radio("💻 OS 선택", ["Windows 💻", "Mac 🍎"], horizontal=True)
 
     if st.session_state.yourjob:
@@ -240,18 +240,19 @@ def get_ai_shortcut_recommendation(query, os_type):
         st.info("직업을 먼저 선택해주세요!")
         st.caption("직업을 먼저 선택해주세요!")
 
+    # -------------------------------
+    # 단축키들을 반복문으로 확인하는 로직 (이 부분이 있어야 합니다)
+    for item in 단축키목록: 
+        # 조건에 안 맞으면 건너뛰기
+        if 조건:
+            continue
 
-# -------------------------------
+        matched_count += 1
+        # 키보드 키 느낌을 주는 백틱 서식 적용
+        st.write(f"- **`{key_to_display}`** — {desc}")
 
-                    continue
-
-            matched_count += 1
-            # 키보드 키 느낌을 주는 백틱 서식 적용
-            st.write(f"- **`{key_to_display}`** — {desc}")
-
-        if matched_count == 0:
-            st.info("검색 조건과 일치하는 단축키가 없습니다.")
-
+    if matched_count == 0:
+        st.info("검색 조건과 일치하는 단축키가 없습니다.")
 
 # -------------------------------
 # 3. 유용한 사이트
