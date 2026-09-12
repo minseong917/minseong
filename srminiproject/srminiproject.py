@@ -75,7 +75,7 @@ if not st.session_state.logged_in:
     # 2. 일반 로그인
     elif auth_mode == "일반 로그인":
         with st.sidebar.form("login_form"):
-            login_id = st.text_input("아이디 ()")
+            login_id = st.text_input("아이디")
             login_pw = st.text_input("비밀번호", type="password")
             submit_login = st.form_submit_button("로그인")
 
@@ -94,7 +94,7 @@ if not st.session_state.logged_in:
     # 3. 회원가입 (비밀번호 확인 포함)
     elif auth_mode == "회원가입":
         with st.sidebar.form("signup_form"):
-            new_id = st.text_input("사용할 아이디 ()")
+            new_id = st.text_input("사용할 아이디")
             new_pw = st.text_input("비밀번호", type="password")
             confirm_pw = st.text_input("비밀번호 확인", type="password")
             submit_signup = st.form_submit_button("회원가입")
