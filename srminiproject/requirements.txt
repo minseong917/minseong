@@ -1,4 +1,3 @@
-streamlit
+streamlit>=1.40.0
+Authlib>=1.3.2
 pyyaml
-streamlit-oauth
-streamlit[auth]
