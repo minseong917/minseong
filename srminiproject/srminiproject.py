@@ -227,7 +227,7 @@ def get_ai_shortcut_recommendation(query, os_type):
             st.session_state.logged_in = True
             st.session_state.user_id = sid
             st.session_state.yourjob = user_data[sid].get("job", None)
-                st.session_state.my_notes = user_data[sid].get("notes", [])
+            st.session_state.my_notes = user_data[sid].get("notes", [])
             st.rerun()
     st.write("---")
 
