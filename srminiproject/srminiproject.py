@@ -126,19 +126,6 @@ if not st.session_state.logged_in:
 
     st.stop()
 
-else:
-    # 로그인 완료 후 메인 화면
-    st.sidebar.success(f"로그인됨: **{st.session_state.user_id}**님")
-    if st.sidebar.button("로그아웃", use_container_width=True):
-        st.session_state.logged_in = False
-        st.session_state.user_id = None
-        try:
-            if st.user.is_logged_in:
-                st.logout()
-        except Exception:
-            pass
-        st.rerun()
-
     st.title("✨ 스마트 직업 치트시트 & 단축키 도감")
 # -------------------------------
 # 단축키 데이터 (Windows 키, Mac 키, 기능 설명)
