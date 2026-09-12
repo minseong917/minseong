@@ -1,3 +1,4 @@
 streamlit
 pyyaml
 streamlit-oauth
+streamlit[auth]
