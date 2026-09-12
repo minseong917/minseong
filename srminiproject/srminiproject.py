@@ -48,34 +48,37 @@ if "yourjob" not in st.session_state:
 if "my_notes" not in st.session_state:
     st.session_state.my_notes = []
 
+# 앱 실행 시 구글 로그인이 이미 되어있는지 체크
+try:
+    if st.user.is_logged_in and not st.session_state.logged_in:
+        user_email = st.user.email
+        st.session_state.logged_in = True
+        st.session_state.user_id = user_email
+        if user_email not in user_data:
+            user_data[user_email] = {"job": None, "notes": [], "password": None}
+            save_data(user_data)
+        st.session_state.yourjob = user_data[user_email].get("job", None)
+        st.session_state.my_notes = user_data[user_email].get("notes", [])
+        st.rerun()
+except Exception:
+    pass
+
 # 로그인 상태 확인
 if not st.session_state.logged_in:
     st.sidebar.title("🔒 로그인 / 회원가입")
-    auth_mode = st.sidebar.radio("모드 선택", ["구글 로그인", "일반 로그인", "회원가입"])
+    
+    # 라디오 버튼 대신 깔끔한 셀렉박스 사용
+    auth_mode = st.sidebar.selectbox("인증 방식 선택", ["구글 로그인", "일반 로그인", "회원가입"])
 
     # 1. 구글 로그인
     if auth_mode == "구글 로그인":
         if st.sidebar.button("구글로 로그인", use_container_width=True, on_click=st.login):
             pass
-        
-        try:
-            if st.user.is_logged_in:
-                user_email = st.user.email
-                st.session_state.logged_in = True
-                st.session_state.user_id = user_email
-                if user_email not in user_data:
-                    user_data[user_email] = {"job": None, "notes": [], "password": None}
-                    save_data(user_data)
-                st.session_state.yourjob = user_data[user_email].get("job", None)
-                st.session_state.my_notes = user_data[user_email].get("notes", [])
-                st.rerun()
-        except Exception:
-            pass
 
     # 2. 일반 로그인
     elif auth_mode == "일반 로그인":
         with st.sidebar.form("login_form"):
-            login_id = st.text_input("아이디")
+            login_id = st.text_input("아이디 (이메일)")
             login_pw = st.text_input("비밀번호", type="password")
             submit_login = st.form_submit_button("로그인")
 
@@ -94,7 +97,7 @@ if not st.session_state.logged_in:
     # 3. 회원가입 (비밀번호 확인 포함)
     elif auth_mode == "회원가입":
         with st.sidebar.form("signup_form"):
-            new_id = st.text_input("사용할 아이디")
+            new_id = st.text_input("사용할 아이디 (이메일)")
             new_pw = st.text_input("비밀번호", type="password")
             confirm_pw = st.text_input("비밀번호 확인", type="password")
             submit_signup = st.form_submit_button("회원가입")
