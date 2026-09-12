@@ -864,30 +864,7 @@ with st.sidebar:
                 st.session_state.my_notes = user_data[sid].get("notes", [])
                 st.rerun()
 
-            if cn.button("🟢 네이버", key="btn_naver", use_container_width=True):
-                sid = "Naver_사용자"
-                if sid not in user_data:
-                    user_data[sid] = {"password": "", "job": None, "notes": []}
-                user_data["__auto_login__"] = sid
-                save_data(user_data)
-                st.session_state.logged_in = True
-                st.session_state.user_id = sid
-                st.session_state.yourjob = user_data[sid].get("job", None)
-                st.session_state.my_notes = user_data[sid].get("notes", [])
-                st.rerun()
-
-            if ck.button("🟡 카카오", key="btn_kakao", use_container_width=True):
-                sid = "Kakao_사용자"
-                if sid not in user_data:
-                    user_data[sid] = {"password": "", "job": None, "notes": []}
-                user_data["__auto_login__"] = sid
-                save_data(user_data)
-                st.session_state.logged_in = True
-                st.session_state.user_id = sid
-                st.session_state.yourjob = user_data[sid].get("job", None)
-                st.session_state.my_notes = user_data[sid].get("notes", [])
-                st.rerun()
-
+            
     st.write("---")
 
     # 2. OS 선택
