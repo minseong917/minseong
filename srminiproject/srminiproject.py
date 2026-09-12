@@ -2,6 +2,8 @@ import streamlit as st
 import time
 import json
 import os
+import requests
+import urllib.parse
 
 # -------------------------------
 # 0. 브라우저 탭 설정 (제목 및 아이콘)
@@ -35,43 +37,101 @@ def save_data(data):
 user_data = load_data()
 
 # -------------------------------
-# 세션 상태 초기화 & 구글 로그인 연동
+# 세션 상태 초기화 & 로그인 관리 (구글 + 일반 로그인)
 # -------------------------------
+if "logged_in" not in st.session_state:
+    st.session_state.logged_in = False
+if "user_id" not in st.session_state:
+    st.session_state.user_id = None
 if "yourjob" not in st.session_state:
     st.session_state.yourjob = None
 if "my_notes" not in st.session_state:
     st.session_state.my_notes = []
 
-# Streamlit 공식 인증 기능(st.user)을 활용한 구글 로그인 상태 확인
-if not st.user.is_logged_in:
-    st.sidebar.title("🔒 로그인")
-    st.sidebar.write("서비스를 이용하려면 구글 계정으로 로그인해 주세요.")
-    st.sidebar.button("구글로 로그인", on_click=st.login, use_container_width=True)
-    
-    # 로그인하지 않은 상태에서는 앱을 진행하지 않고 중단
-    st.info("👈 사이드바에서 구글 로그인을 진행해주세요.")
+# 로그인 상태 확인
+if not st.session_state.logged_in:
+    st.sidebar.title("🔒 로그인 / 회원가입")
+    auth_mode = st.sidebar.radio("모드 선택", ["구글 로그인", "일반 로그인", "회원가입"])
+
+    # 1. 구글 로그인
+    if auth_mode == "구글 로그인":
+        if st.sidebar.button("구글로 로그인", use_container_width=True, on_click=st.login):
+            pass
+        
+        try:
+            if st.user.is_logged_in:
+                user_email = st.user.email
+                st.session_state.logged_in = True
+                st.session_state.user_id = user_email
+                if user_email not in user_data:
+                    user_data[user_email] = {"job": None, "notes": [], "password": None}
+                    save_data(user_data)
+                st.session_state.yourjob = user_data[user_email].get("job", None)
+                st.session_state.my_notes = user_data[user_email].get("notes", [])
+                st.rerun()
+        except Exception:
+            pass
+
+    # 2. 일반 로그인
+    elif auth_mode == "일반 로그인":
+        with st.sidebar.form("login_form"):
+            login_id = st.text_input("아이디 (이메일)")
+            login_pw = st.text_input("비밀번호", type="password")
+            submit_login = st.form_submit_button("로그인")
+
+            if submit_login:
+                if login_id in user_data and user_data[login_id].get("password") == login_pw:
+                    st.session_state.logged_in = True
+                    st.session_state.user_id = login_id
+                    st.session_state.yourjob = user_data[login_id].get("job", None)
+                    st.session_state.my_notes = user_data[login_id].get("notes", [])
+                    st.success("로그인 성공!")
+                    time.sleep(0.5)
+                    st.rerun()
+                else:
+                    st.error("아이디 또는 비밀번호가 올바르지 않습니다.")
+
+    # 3. 회원가입 (비밀번호 확인 포함)
+    elif auth_mode == "회원가입":
+        with st.sidebar.form("signup_form"):
+            new_id = st.text_input("사용할 아이디 (이메일)")
+            new_pw = st.text_input("비밀번호", type="password")
+            confirm_pw = st.text_input("비밀번호 확인", type="password")
+            submit_signup = st.form_submit_button("회원가입")
+
+            if submit_signup:
+                if not new_id or not new_pw:
+                    st.warning("모든 항목을 입력해주세요.")
+                elif new_id in user_data:
+                    st.error("이미 존재하는 아이디입니다.")
+                elif new_pw != confirm_pw:
+                    st.error("비밀번호가 일치하지 않습니다.")
+                else:
+                    user_data[new_id] = {
+                        "job": None,
+                        "notes": [],
+                        "password": new_pw
+                    }
+                    save_data(user_data)
+                    st.success("회원가입이 완료되었습니다! 로그인해 주세요.")
+
+    st.info("👈 사이드바에서 로그인 또는 회원가입을 진행해 주세요.")
     st.stop()
+
 else:
-    # 구글 로그인이 완료된 사용자 식별자(이메일) 사용
-    user_email = st.user.email
-    st.session_state.logged_in = True
-    st.session_state.user_id = user_email
-
-    # 유저 데이터에 해당 계정이 없으면 초기화
-    if user_email not in user_data:
-        user_data[user_email] = {"job": None, "notes": []}
-        save_data(user_data)
-
-    # 기존 저장된 데이터 불러오기
-    st.session_state.yourjob = user_data[user_email].get("job", None)
-    st.session_state.my_notes = user_data[user_email].get("notes", [])
-
-    # 사이드바에 유저 정보 및 로그아웃 버튼 표시
-    st.sidebar.success(f"로그인됨: **{st.user.name}**님")
+    # 로그인 완료 후 메인 화면
+    st.sidebar.success(f"로그인됨: **{st.session_state.user_id}**님")
     if st.sidebar.button("로그아웃", use_container_width=True):
-        st.logout()
+        st.session_state.logged_in = False
+        st.session_state.user_id = None
+        try:
+            if st.user.is_logged_in:
+                st.logout()
+        except Exception:
+            pass
+        st.rerun()
 
-
+    st.title("✨ 스마트 직업 치트시트 & 단축키 도감")
 # -------------------------------
 # 단축키 데이터 (Windows 키, Mac 키, 기능 설명)
 # -------------------------------
