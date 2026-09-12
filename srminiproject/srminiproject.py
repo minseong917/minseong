@@ -208,27 +208,27 @@ def get_ai_shortcut_recommendation(query, os_type):
 
             # 구글 계정으로 로그인 (실제 OAuth 연동)
             # 1초 간편 소셜 로그인 (구글)
-            st.write("---")
-            st.caption(" G 구글 계정 간편 로그인")
-            google_auth_url = (
-                f"https://accounts.google.com/o/oauth2/v2/auth?response_type=code"
-                f"&client_id={GOOGLE_CLIENT_ID}&redirect_uri={REDIRECT_URI}"
+        st.write("---")
+        st.caption(" G 구글 계정 간편 로그인")
+        google_auth_url = (
+            f"https://accounts.google.com/o/oauth2/v2/auth?response_type=code"
+            f"&client_id={GOOGLE_CLIENT_ID}&redirect_uri={REDIRECT_URI}"
                 f"&scope=openid%20email%20profile"
             )
-            st.link_button("구글 계정으로 로그인 ↗", google_auth_url, use_container_width=True)
-            st.caption("🚀 1초 간편 소셜 로그인")
-            cg, cn, ck = st.columns(3)
-            if cg.button("구글", key="btn_google", use_container_width=True):
-                sid = "Google_사용자"
-                if sid not in user_data:
-                    user_data[sid] = {"password": "", "job": None, "notes": []}
-                user_data["__auto_login__"] = sid
-                save_data(user_data)
-                st.session_state.logged_in = True
-                st.session_state.user_id = sid
-                st.session_state.yourjob = user_data[sid].get("job", None)
+        st.link_button("구글 계정으로 로그인 ↗", google_auth_url, use_container_width=True)
+        st.caption("🚀 1초 간편 소셜 로그인")
+        cg, cn, ck = st.columns(3)
+        if cg.button("구글", key="btn_google", use_container_width=True):
+            sid = "Google_사용자"
+            if sid not in user_data:
+                user_data[sid] = {"password": "", "job": None, "notes": []}
+            user_data["__auto_login__"] = sid
+            save_data(user_data)
+            st.session_state.logged_in = True
+            st.session_state.user_id = sid
+            st.session_state.yourjob = user_data[sid].get("job", None)
                 st.session_state.my_notes = user_data[sid].get("notes", [])
-                st.rerun()
+            st.rerun()
     st.write("---")
 
     # 2. OS 선택
