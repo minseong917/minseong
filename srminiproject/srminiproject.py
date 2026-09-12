@@ -39,6 +39,9 @@ user_data = load_data()
 # -------------------------------
 # 세션 상태 초기화 & 로그인 관리 (구글 + 일반 로그인)
 # -------------------------------
+# -------------------------------
+# 세션 상태 초기화 & 로그인 관리 (구글 + 일반 로그인)
+# -------------------------------
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
 if "user_id" not in st.session_state:
@@ -67,20 +70,22 @@ except Exception:
 if not st.session_state.logged_in:
     st.sidebar.title("🔒 로그인 / 회원가입")
     
-    # 라디오 버튼 대신 깔끔한 셀렉박스 사용
-    auth_mode = st.sidebar.selectbox("인증 방식 선택", ["구글 로그인", "일반 로그인", "회원가입"])
+    # 탭으로 모드 전환
+    tab_google, tab_login, tab_signup = st.sidebar.tabs(["구글 로그인", "일반 로그인", "회원가입"])
 
-    # 1. 구글 로그인
-    if auth_mode == "구글 로그인":
-        if st.sidebar.button("구글로 로그인", use_container_width=True, on_click=st.login):
+    # 1. 구글 로그인 탭
+    with tab_google:
+        st.write("")
+        if st.button("구글로 로그인", use_container_width=True, on_click=st.login):
             pass
 
-    # 2. 일반 로그인
-    elif auth_mode == "일반 로그인":
-        with st.sidebar.form("login_form"):
+    # 2. 일반 로그인 탭
+    with tab_login:
+        st.write("")
+        with st.form("login_form"):
             login_id = st.text_input("아이디 (이메일)")
             login_pw = st.text_input("비밀번호", type="password")
-            submit_login = st.form_submit_button("로그인")
+            submit_login = st.form_submit_button("로그인", use_container_width=True)
 
             if submit_login:
                 if login_id in user_data and user_data[login_id].get("password") == login_pw:
@@ -94,13 +99,14 @@ if not st.session_state.logged_in:
                 else:
                     st.error("아이디 또는 비밀번호가 올바르지 않습니다.")
 
-    # 3. 회원가입 (비밀번호 확인 포함)
-    elif auth_mode == "회원가입":
-        with st.sidebar.form("signup_form"):
+    # 3. 회원가입 탭 (비밀번호 확인 포함)
+    with tab_signup:
+        st.write("")
+        with st.form("signup_form"):
             new_id = st.text_input("사용할 아이디 (이메일)")
             new_pw = st.text_input("비밀번호", type="password")
             confirm_pw = st.text_input("비밀번호 확인", type="password")
-            submit_signup = st.form_submit_button("회원가입")
+            submit_signup = st.form_submit_button("회원가입", use_container_width=True)
 
             if submit_signup:
                 if not new_id or not new_pw:
@@ -116,9 +122,8 @@ if not st.session_state.logged_in:
                         "password": new_pw
                     }
                     save_data(user_data)
-                    st.success("회원가입이 완료되었습니다! 로그인해 주세요.")
+                    st.success("회원가입 완료! 일반 로그인 탭에서 로그인해 주세요.")
 
-    st.info("👈 사이드바에서 로그인 또는 회원가입을 진행해 주세요.")
     st.stop()
 
 else:
