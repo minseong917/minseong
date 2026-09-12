@@ -14,12 +14,10 @@ st.set_page_config(
     layout="centered",
 )
 
-
 # -------------------------------
 # 사용자 데이터 파일 관리 (JSON 저장소)
 # -------------------------------
 DATA_FILE = "user_data.json"
-
 
 def load_data():
     if not os.path.exists(DATA_FILE):
@@ -30,35 +28,48 @@ def load_data():
     except Exception:
         return {}
 
-
 def save_data(data):
     with open(DATA_FILE, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
-
 user_data = load_data()
 
-
 # -------------------------------
-# 세션 상태 초기화 & 자동 로그인
+# 세션 상태 초기화 & 구글 로그인 연동
 # -------------------------------
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
-if "user_id" not in st.session_state:
-    st.session_state.user_id = None
 if "yourjob" not in st.session_state:
     st.session_state.yourjob = None
 if "my_notes" not in st.session_state:
     st.session_state.my_notes = []
 
-# 이전에 자동 로그인을 켜둔 계정이 있으면 자동 로그인 복원
-if not st.session_state.logged_in and user_data.get("__auto_login__"):
-    saved_user = user_data["__auto_login__"]
-    if saved_user in user_data:
-        st.session_state.logged_in = True
-        st.session_state.user_id = saved_user
-        st.session_state.yourjob = user_data[saved_user].get("job", None)
-        st.session_state.my_notes = user_data[saved_user].get("notes", [])
+# Streamlit 공식 인증 기능(st.user)을 활용한 구글 로그인 상태 확인
+if not st.user.is_logged_in:
+    st.sidebar.title("🔒 로그인")
+    st.sidebar.write("서비스를 이용하려면 구글 계정으로 로그인해 주세요.")
+    st.sidebar.button("구글로 로그인", on_click=st.login, use_container_width=True)
+    
+    # 로그인하지 않은 상태에서는 앱을 진행하지 않고 중단
+    st.info("👈 사이드바에서 구글 로그인을 진행해주세요.")
+    st.stop()
+else:
+    # 구글 로그인이 완료된 사용자 식별자(이메일) 사용
+    user_email = st.user.email
+    st.session_state.logged_in = True
+    st.session_state.user_id = user_email
+
+    # 유저 데이터에 해당 계정이 없으면 초기화
+    if user_email not in user_data:
+        user_data[user_email] = {"job": None, "notes": []}
+        save_data(user_data)
+
+    # 기존 저장된 데이터 불러오기
+    st.session_state.yourjob = user_data[user_email].get("job", None)
+    st.session_state.my_notes = user_data[user_email].get("notes", [])
+
+    # 사이드바에 유저 정보 및 로그아웃 버튼 표시
+    st.sidebar.success(f"로그인됨: **{st.user.name}**님")
+    if st.sidebar.button("로그아웃", use_container_width=True):
+        st.logout()
 
 
 # -------------------------------
