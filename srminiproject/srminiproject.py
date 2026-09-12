@@ -69,10 +69,9 @@ if "code" in st.query_params and "state" not in st.query_params and not st.sessi
 # 이전에 자동 로그인을 켜둔 계정이 있으면 자동 로그인 복원
 if not st.session_state.logged_in and user_data.get("__auto_login__"):
     saved_user = user_data["__auto_login__"]
-
-        st.session_state.user_id = saved_user
-        st.session_state.yourjob = user_data[saved_user].get("job", None)
-        st.session_state.my_notes = user_data[saved_user].get("notes", [])
+    st.session_state.user_id = saved_user
+    st.session_state.yourjob = user_data[saved_user].get("job", None)
+    st.session_state.my_notes = user_data[saved_user].get("notes", [])
 
 
 # -------------------------------
