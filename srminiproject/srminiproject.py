@@ -83,7 +83,7 @@ if not st.session_state.logged_in:
     with tab_login:
         st.write("")
         with st.form("login_form"):
-            login_id = st.text_input("아이디 (이메일)")
+            login_id = st.text_input("아이디")
             login_pw = st.text_input("비밀번호", type="password")
             submit_login = st.form_submit_button("로그인", use_container_width=True)
 
@@ -103,7 +103,7 @@ if not st.session_state.logged_in:
     with tab_signup:
         st.write("")
         with st.form("signup_form"):
-            new_id = st.text_input("사용할 아이디 (이메일)")
+            new_id = st.text_input("사용할 아이디")
             new_pw = st.text_input("비밀번호", type="password")
             confirm_pw = st.text_input("비밀번호 확인", type="password")
             submit_signup = st.form_submit_button("회원가입", use_container_width=True)
