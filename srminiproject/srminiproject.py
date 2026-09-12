@@ -13,8 +13,6 @@ REDIRECT_URI = "https://smartjobandusefullkeys.streamlit.app/"
 # -------------------------------
 ICON_FILE = "app_icon.png" if os.path.exists("app_icon.png") else "💡"
 
-@@ -40,8 +35,9 @@ def save_data(data):
-
 user_data = load_data()
 
 
@@ -24,7 +22,7 @@ user_data = load_data()
 # -------------------------------
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
-@@ -52,46 +48,6 @@ def save_data(data):
+
 if "my_notes" not in st.session_state:
     st.session_state.my_notes = []
 
@@ -71,7 +69,7 @@ if "code" in st.query_params and "state" not in st.query_params and not st.sessi
 # 이전에 자동 로그인을 켜둔 계정이 있으면 자동 로그인 복원
 if not st.session_state.logged_in and user_data.get("__auto_login__"):
     saved_user = user_data["__auto_login__"]
-@@ -100,6 +56,8 @@ def save_data(data):
+
         st.session_state.user_id = saved_user
         st.session_state.yourjob = user_data[saved_user].get("job", None)
         st.session_state.my_notes = user_data[saved_user].get("notes", [])
@@ -236,7 +234,7 @@ def get_ai_shortcut_recommendation(query, os_type):
 
     # 2. OS 선택
     os_type = st.radio("💻 OS 선택", ["Windows 💻", "Mac 🍎"], horizontal=True)
-@@ -475,7 +480,7 @@ def k(win, mac):
+
     if st.session_state.yourjob:
         st.info(f"선택 직업: **{st.session_state.yourjob}**")
     else:
@@ -245,7 +243,7 @@ def get_ai_shortcut_recommendation(query, os_type):
 
 
 # -------------------------------
-@@ -538,14 +543,15 @@ def k(win, mac):
+
                     continue
 
             matched_count += 1
@@ -262,7 +260,7 @@ def get_ai_shortcut_recommendation(query, os_type):
 # -------------------------------
 elif menu == "유용한 사이트":
     st.title("🌐 유용한 사이트")
-@@ -565,7 +571,7 @@ def k(win, mac):
+
 
 
 # -------------------------------
@@ -271,7 +269,7 @@ elif menu == "유용한 사이트":
 # -------------------------------
 elif menu == "나만의 단축키 메모":
     st.title("📝 나만의 단축키 메모")
-@@ -577,9 +583,10 @@ def k(win, mac):
+
 
     tab_ai, tab_manual = st.tabs(["🤖 AI 단축키 추천 비서", "✏️ 직접 입력 등록"])
 
@@ -283,7 +281,7 @@ elif menu == "나만의 단축키 메모":
 
         st.caption("💡 빠른 질문 버튼을 눌러보세요:")
         c1, c2, c3, c4 = st.columns(4)
-@@ -618,7 +625,7 @@ def k(win, mac):
+
                     if col_btn.button("➕ 내 메모에 추가", key=f"ai_add_{i}"):
                         st.session_state.my_notes.append({
                             "key": item["key"],
@@ -292,7 +290,7 @@ elif menu == "나만의 단축키 메모":
                         })
                         if st.session_state.logged_in:
                             user_data[st.session_state.user_id]["notes"] = st.session_state.my_notes
-@@ -627,6 +634,7 @@ def k(win, mac):
+
                         time.sleep(0.5)
                         st.rerun()
 
@@ -300,7 +298,7 @@ elif menu == "나만의 단축키 메모":
     with tab_manual:
         st.subheader("✏️ 직접 단축키 등록")
         with st.form("manual_note_form", clear_on_submit=True):
-@@ -647,6 +655,7 @@ def k(win, mac):
+
                 else:
                     st.warning("단축키와 설명을 모두 입력해주세요.")
 
@@ -308,7 +306,7 @@ elif menu == "나만의 단축키 메모":
     st.write("---")
     st.subheader("📋 내가 등록한 단축키 목록")
 
-@@ -666,7 +675,7 @@ def k(win, mac):
+
 
 
 # -------------------------------
@@ -317,7 +315,7 @@ elif menu == "나만의 단축키 메모":
 # -------------------------------
 elif menu == "치트시트 다운로드":
     st.title("📥 치트시트 다운로드")
-@@ -677,6 +686,7 @@ def k(win, mac):
+
         current_job = st.session_state.yourjob
         st.write(f"선택된 직업인 **'{current_job}'**의 맞춤 단축키({os_type})와 추천 사이트, 나만의 메모를 텍스트 파일로 다운로드합니다.")
 
