@@ -883,13 +883,14 @@ with st.sidebar:
         st.success(
             f"👤 **{st.session_state.user_id}**님 접속 중\n\n📝 등록 메모: **{len(st.session_state.my_notes)}개**"
         )
-        if st.button("로그아웃", use_container_width=True):
-            user_data["__auto_login__"] = None
-            save_data(user_data)
+        if st.button("로그아웃", key="logout_button", use_container_width=True):
             st.session_state.logged_in = False
             st.session_state.user_id = None
-            st.session_state.yourjob = None
-            st.session_state.my_notes = []
+            try:
+                if st.user.is_logged_in:
+                    st.logout()
+            except Exception:
+                pass
             st.rerun()
     else:
         with st.expander("🔐 로그인 / 회원가입", expanded=False):
